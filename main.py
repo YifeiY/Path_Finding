@@ -10,13 +10,13 @@ def main():
 
   # Greedy Search
   greedy_solution = writeSolutionToMaze(maze,greedy(maze,start,goal))
-  print("\nGreedy Algorithm Solution")
+  print("\nGreedy Algorithm Solution:")
   showMaze(greedy_solution)
 
 
 
+## Greedy Search, return a list of solution
 def greedy(maze,start,goal):
-
   # Base case: solution found
   if start == goal:
     return [goal]
@@ -46,7 +46,12 @@ def greedy(maze,start,goal):
       return solution
   return [] # No solution found
 
+
+## Update the maze, replace a maze with solution path replaced by "P"
 def writeSolutionToMaze(maze,solution):
+  if solution == []:
+    return["\tGreedy algorithm found no solution exists"]
+
   for p in solution:
     maze[p[0]][p[1]] = "P"
   maze[solution[0][0]][solution[0][1]] = "S"
@@ -54,6 +59,7 @@ def writeSolutionToMaze(maze,solution):
   return maze
 
 
+## Identify where the next move can be, return an array of legal moves
 def legalPoints(maze,center):
     bound = len(maze)
     illegal = ["X","S"]
