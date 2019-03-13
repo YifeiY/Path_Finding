@@ -1,4 +1,5 @@
 import heapq as pq
+from random import random
 
 class pathfinding:
     def __init__(self, filename_a="pathfinding_a.txt", filename_b="pathfinding_b.txt"):
@@ -41,9 +42,9 @@ class pathfinding:
         for row in range(0,rows):
             for col in range(0,cols):
                 if grid[row][col] == "S":
-                    S_G[0] = (row, col)
+                    start_goal[0] = (row, col)
                 elif grid[row][col] == "G":
-                    S_G[1] = (row, col)
+                    start_goal[1] = (row, col)
         print("Start point is at:", start_goal[0], "\nEnd point is at:", start_goal[1])
         return start_goal
 
@@ -141,3 +142,29 @@ class pathfinding:
                     came_from[neighbor] = current
         print("Goal Not Found")
         return None
+
+def mazes_maker(num):
+    mazes = []
+    for i in range(num):
+        maze = [["X"]*1024]
+        for j in range(1022):
+            row = ["X"]
+            for k in range(1022):
+                row.append("X" if random() < 0.6 else "_")
+            row.append("X")
+            maze.append(row)
+        mazes.append(maze)
+    for maze in mazes:
+        start = [int(1021*random() + 1),int(1021*random() + 1)]
+        goal = [int(1021*random() + 1),int(1021*random() + 1)]
+        maze[start[0]][start[1]] = "S"
+        maze[goal[0]][goal[1]] = "G"
+    print("finished initializing mazes")
+    return mazes
+
+mazes = mazes_maker(10)
+pf = pathfinding()
+
+for m in mazes:
+    sg = pf.find_start_goal(m)
+    a.A_star(m, sg[0], sg[1], )
