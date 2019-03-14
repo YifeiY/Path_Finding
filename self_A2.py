@@ -204,7 +204,7 @@ def mazes_maker(num):
         for j in range(1022):
             row = ["X"]
             for k in range(1022):
-                row.append("X" if random() < 0.5 else "_")
+                row.append("X" if random() < 0.3 else "_")
             row.append("X")
             maze.append(row)
         mazes.append(maze)
