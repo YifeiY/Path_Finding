@@ -153,7 +153,6 @@ class pathfinding:
                     print("Time elapsed: %fs" % (end-start))
                     if greedy_path is None:
                         print("No solution found by greedy algorithm\n")
-                        continue
                     else:
                         print("Solution found by greedy algorithm\n")
                         self.write_file(self.filename_b_out, self.draw(greedy_path, deepcopy(grid)), "Greedy")
@@ -161,15 +160,13 @@ class pathfinding:
                     A_star_path = self.A_star(grid, start_goal[0], start_goal[-1], self.movement_with_diagonal)
                     end = time.perf_counter()
                     print("Time elapsed: %fs" % (end-start))
-                    if greedy_path is None:
+                    if A_star_path is None:
                         print("No solution found by A* algorithm\n")
-                        continue
                     else:
                         print("Solution found by A* algorithm\n")
                         self.write_file(self.filename_b_out, self.draw(A_star_path, deepcopy(grid)), "A*")
                 else:
                     print("No start or goal point found\n")
-                    continue
         else:
             if len(self.grids_a) <= 0:
                 print("The input is empty\n")
@@ -183,7 +180,6 @@ class pathfinding:
                     print("Time elapsed: %fs" % (end-start))
                     if greedy_path is None:
                         print("No solution found by greedy algorithm\n")
-                        continue
                     else:
                         print("Solution found by greedy algorithm\n")
                         self.write_file(self.filename_a_out, self.draw(greedy_path, deepcopy(grid)), "Greedy")
@@ -191,15 +187,13 @@ class pathfinding:
                     A_star_path = self.A_star(grid, start_goal[0], start_goal[-1], self.movement_without_diagonal)
                     end = time.perf_counter()
                     print("Time elapsed: %fs" % (end-start))
-                    if greedy_path is None:
+                    if A_star_path is None:
                         print("No solution found by A* algorithm\n")
-                        continue
                     else:
                         print("Solution found by A* algorithm\n")
                         self.write_file(self.filename_a_out, self.draw(A_star_path, deepcopy(grid)), "A*")
                 else:
                     print("No start or goal point found\n")
-                    continue
         print("Execute Finished\n")
         return None
 
