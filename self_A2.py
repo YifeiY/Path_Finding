@@ -1,5 +1,5 @@
 import heapq as pq
-from random import random
+from copy import deepcopy
 
 class pathfinding:
     def __init__(self, filename_a="pathfinding_a.txt", filename_b="pathfinding_b.txt"):
@@ -70,17 +70,17 @@ class pathfinding:
         priority = {start: self.heuristic(start, goal)}
         pq.heappush(frontier, (priority[start], start))
         visited = set()
-        came_from = dict()
+        came_from = {}
         while frontier:
             current = pq.heappop(frontier)[1]
             # If goal found
-            if current == goal:  # If its goal its done, and print the path
+            if current == goal: # If its goal its done, and print the path
                 print("Goal Found")
                 path = []
                 while current in came_from:
                     path.append(current)
-                    current = came_from[current]  # Back trace to origin
-                path = list(reversed(path))  # Reverse the path to real goal
+                    current = came_from[current] # Back trace to origin
+                path = list(reversed(path)) # Reverse the path to real goal
                 return path
             visited.add(current)
             for i, j in movement:
@@ -107,27 +107,27 @@ class pathfinding:
         return None
 
     def greedy(self, grid, start, goal, movement):
-        frontier = []  # This is a priority queue
+        frontier = [] # This is a priority queue
         priority = {start: self.heuristic(start, goal)}
         pq.heappush(frontier, (priority[start], start))
         visited = set()
-        came_from = dict()  # Start comes from none
+        came_from = {} # Start comes from none
         while frontier:
-            current = pq.heappop(frontier)[1]  # Get coordinate
-            if current == goal:  # If its goal is found
+            current = pq.heappop(frontier)[1] # Get coordinate
+            if current == goal: # If its goal is found
                 print("Goal Found")
                 path = []
                 while current in came_from:
                     path.append(current)
-                    current = came_from[current]  # Back trace to origin
-                path = list(reversed(path))  # Reverse the path to real goal
+                    current = came_from[current] # Back trace to origin
+                path = list(reversed(path)) # Reverse the path to real goal
                 return path
             visited.add(current) # Add current into visited list, prevent visit again
             for i, j in movement:
-                neighbor = current[0] + i, current[1] + j  # Neighbor's coordinate calculated with the move list
-                if 0 <= neighbor[0] < len(grid):  # If its inside left and right wall
+                neighbor = current[0] + i, current[1] + j # Neighbor's coordinate calculated with the move list
+                if 0 <= neighbor[0] < len(grid): # If its inside left and right wall
                     if 0 <= neighbor[1] < len(grid[0]): # If itz inside up and bottom wall
-                        if grid[neighbor[0]][neighbor[1]] == "X":  # If its a internal wall
+                        if grid[neighbor[0]][neighbor[1]] == "X": # If its a internal wall
                             continue # Skip this move
                     else:
                         # Grid bound y walls
@@ -150,31 +150,47 @@ class pathfinding:
                 start_goal = self.find_start_goal(grid)
                 if start_goal:
                     greedy_path = self.greedy(grid, start_goal[0], start_goal[-1], self.movement_with_diagonal)
-                    self.write_file(self.filename_b_out, self.draw(greedy_path, grid), "Greedy")
-                    print("Found solution for greedy algorithm")
+                    if greedy_path is None:
+                        print("No solution found by greedy algorithm")
+                        continue
+                    else:
+                        print("Solution found by greedy algorithm")
+                        self.write_file(self.filename_b_out, self.draw(greedy_path, deepcopy(grid)), "Greedy")
                     A_star_path = self.A_star(grid, start_goal[0], start_goal[-1], self.movement_with_diagonal)
-                    self.write_file(self.filename_b_out, self.draw(A_star_path, grid), "A*")
-                    print("Found solution for A* algorithm")
+                    if greedy_path is None:
+                        print("No solution found by A* algorithm")
+                        continue
+                    else:
+                        print("Solution found by A* algorithm")
+                        self.write_file(self.filename_b_out, self.draw(A_star_path, deepcopy(grid)), "A*")
                 else:
-                    print("Error")
-                    return None
+                    print("No start or goal point found")
+                    continue
         else:
             for grid in self.grids_a:
                 start_goal = self.find_start_goal(grid)
                 if start_goal:
                     greedy_path = self.greedy(grid, start_goal[0], start_goal[-1], self.movement_without_diagonal)
-                    self.write_file(self.filename_a_out, self.draw(greedy_path, grid), "Greedy")
-                    print("Found solution for greedy algorithm")
+                    if greedy_path is None:
+                        print("No solution found by greedy algorithm")
+                        continue
+                    else:
+                        print("Solution found by greedy algorithm")
+                        self.write_file(self.filename_a_out, self.draw(greedy_path, deepcopy(grid)), "Greedy")
                     A_star_path = self.A_star(grid, start_goal[0], start_goal[-1], self.movement_without_diagonal)
-                    self.write_file(self.filename_a_out, self.draw(A_star_path, grid), "A*")
-                    print("Found solution for A* algorithm")
+                    if greedy_path is None:
+                        print("No solution found by A* algorithm")
+                        continue
+                    else:
+                        print("Solution found by A* algorithm")
+                        self.write_file(self.filename_a_out, self.draw(A_star_path, deepcopy(grid)), "A*")
                 else:
-                    print("Error")
-                    return None
+                    print("No start or goal point found")
+                    continue
         print("Execute Finished")
         return None
 
 if __name__ == "__main__":
     pf = pathfinding()
-    pf.execute(False)
-    pf.execute(True)
+    pf.execute(False) # With diagonal movement
+    pf.execute(True) # Without diagonal movement
