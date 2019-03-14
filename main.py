@@ -3,6 +3,7 @@ from math import sqrt
 from copy import copy
 from random import random
 import sys
+from queue import PriorityQueue
 import threading
 sys.setrecursionlimit(1024 * 512)
 threading.stack_size(671088640)
@@ -11,17 +12,57 @@ def main():
   #print(sys.getrecursionlimit())
   maze,start,goal,illegal = readFile("pathfinding_a.txt")
 
-  print("Got Maze:")
-  showMaze(maze)
+  greedy_solution = iterative_greedy(maze,start,goal,[])
+  if greedy_solution == False:
+    print("Greedy algorithm did not find a solution")
+  else:
+    solution_maze = writeSolutionToMaze(maze,greedy_solution)
+    showMaze(solution_maze)
 
-  # Greedy Search
-  greedy_solution = writeSolutionToMaze(maze,greedy(maze,start,goal,[]))
-  print("\nGreedy Algorithm Solution:")
-  showMaze(greedy_solution)
+
+
+
+
+
+
+  #greedy_solution = writeSolutionToMaze(maze,greedy(maze,start,goal,[]))
 
   #checkEachAlgorithm([greedy])
 
 ## Greedy Search, return a list of solution
+
+
+def iterative_greedy(maze,start,goal,tried):
+  frontier = PriorityQueue()
+  frontier.put(start, 0)
+  came_from = {}
+  came_from[str(start)] = None
+  while not frontier.empty():
+    current = frontier.get()
+    tried.append(current)
+    if current == goal: break
+    for next in legalPoints(maze,current,tried):
+      if str(next) not in came_from:
+        priority = (next[0] - goal[0])**2 + (next[1] - goal[1])**2
+        frontier.put(next, priority)
+        came_from[str(next)] = current
+
+  if frontier.empty and str(goal) not in came_from:
+    return False
+  else:
+    solution = []
+    current = str(goal)
+    while came_from[current] != None:
+      next = came_from[current]
+      solution.append(next)
+      current = str(next)
+  adapted_solution=[]
+  for i in reversed(range(len(solution))):
+    s = solution[i]
+    adapted_solution.append([s[0],s[1]])
+  adapted_solution.append(goal)
+  return adapted_solution
+
 def greedy(maze,start,goal,tried):
 
   # Base case: solution found
