@@ -1,4 +1,4 @@
-import heapq as pq
+import time, heapq as pq
 from copy import deepcopy
 
 class pathfinding:
@@ -35,7 +35,6 @@ class pathfinding:
                 f.write("\n")
             if algo_type == "A*":
                 f.write("\n")
-        print("Write Completes")
         return None
 
     def draw(self, path, grid):
@@ -56,7 +55,7 @@ class pathfinding:
                     start_goal[0] = (row, col)
                 elif grid[row][col] == "G":
                     start_goal[1] = (row, col)
-        print("Start point is at:", start_goal[0], "\nEnd point is at:", start_goal[1])
+        print("Start point is at:", start_goal[0], "\nEnd point is at:", start_goal[1], "\n")
         start_goal = self.remove_empty(start_goal)
         return start_goal if len(start_goal)==2 else None
 
@@ -75,7 +74,6 @@ class pathfinding:
             current = pq.heappop(frontier)[1]
             # If goal found
             if current == goal: # If its goal its done, and print the path
-                print("Goal Found")
                 path = []
                 while current in came_from:
                     path.append(current)
@@ -103,7 +101,6 @@ class pathfinding:
                     cost_so_far[neighbor] = new_cost
                     priority[neighbor] = new_cost + self.heuristic(neighbor, goal)
                     pq.heappush(frontier, (priority[neighbor], neighbor))
-        print("Goal Not Found")
         return None
 
     def greedy(self, grid, start, goal, movement):
@@ -115,7 +112,6 @@ class pathfinding:
         while frontier:
             current = pq.heappop(frontier)[1] # Get coordinate
             if current == goal: # If its goal is found
-                print("Goal Found")
                 path = []
                 while current in came_from:
                     path.append(current)
@@ -141,59 +137,70 @@ class pathfinding:
                     priority[neighbor] = self.heuristic(neighbor, goal)
                     pq.heappush(frontier, (priority[neighbor], neighbor))
                     came_from[neighbor] = current
-        print("Goal Not Found")
         return None
 
     def execute(self, is_diagonal):
         if is_diagonal:
             if len(self.grids_b) <= 0:
-                print("The input is empty")
+                print("The input is empty\n")
                 return None
             for grid in self.grids_b:
                 start_goal = self.find_start_goal(grid)
                 if start_goal:
+                    start = time.perf_counter()
                     greedy_path = self.greedy(grid, start_goal[0], start_goal[-1], self.movement_with_diagonal)
+                    end = time.perf_counter()
+                    print("Time elapsed: %fs" % (end-start))
                     if greedy_path is None:
-                        print("No solution found by greedy algorithm")
+                        print("No solution found by greedy algorithm\n")
                         continue
                     else:
-                        print("Solution found by greedy algorithm")
+                        print("Solution found by greedy algorithm\n")
                         self.write_file(self.filename_b_out, self.draw(greedy_path, deepcopy(grid)), "Greedy")
+                    start = time.perf_counter()
                     A_star_path = self.A_star(grid, start_goal[0], start_goal[-1], self.movement_with_diagonal)
+                    end = time.perf_counter()
+                    print("Time elapsed: %fs" % (end-start))
                     if greedy_path is None:
-                        print("No solution found by A* algorithm")
+                        print("No solution found by A* algorithm\n")
                         continue
                     else:
-                        print("Solution found by A* algorithm")
+                        print("Solution found by A* algorithm\n")
                         self.write_file(self.filename_b_out, self.draw(A_star_path, deepcopy(grid)), "A*")
                 else:
-                    print("No start or goal point found")
+                    print("No start or goal point found\n")
                     continue
         else:
             if len(self.grids_a) <= 0:
-                print("The input is empty")
+                print("The input is empty\n")
                 return None
             for grid in self.grids_a:
                 start_goal = self.find_start_goal(grid)
                 if start_goal:
+                    start = time.perf_counter()
                     greedy_path = self.greedy(grid, start_goal[0], start_goal[-1], self.movement_without_diagonal)
+                    end = time.perf_counter()
+                    print("Time elapsed: %fs" % (end-start))
                     if greedy_path is None:
-                        print("No solution found by greedy algorithm")
+                        print("No solution found by greedy algorithm\n")
                         continue
                     else:
-                        print("Solution found by greedy algorithm")
+                        print("Solution found by greedy algorithm\n")
                         self.write_file(self.filename_a_out, self.draw(greedy_path, deepcopy(grid)), "Greedy")
+                    start = time.perf_counter()
                     A_star_path = self.A_star(grid, start_goal[0], start_goal[-1], self.movement_without_diagonal)
+                    end = time.perf_counter()
+                    print("Time elapsed: %fs" % (end-start))
                     if greedy_path is None:
-                        print("No solution found by A* algorithm")
+                        print("No solution found by A* algorithm\n")
                         continue
                     else:
-                        print("Solution found by A* algorithm")
+                        print("Solution found by A* algorithm\n")
                         self.write_file(self.filename_a_out, self.draw(A_star_path, deepcopy(grid)), "A*")
                 else:
-                    print("No start or goal point found")
+                    print("No start or goal point found\n")
                     continue
-        print("Execute Finished")
+        print("Execute Finished\n")
         return None
 
 if __name__ == "__main__":
