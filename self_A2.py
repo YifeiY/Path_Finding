@@ -1,4 +1,5 @@
 import heapq as pq
+from copy import copy
 from random import random
 
 class pathfinding:
@@ -18,15 +19,15 @@ class pathfinding:
             firstline = list(file.readline())
             firstline = firstline[:-1]
             line = [firstline]
-            next = file.readline()
-            while next != '\n':
+            n = file.readline()
+            while n != '\n':
                 count = 0
-                a = list(next)
+                a = list(n)
                 if a[-1] == "\n":
                     a = a[:-1]
                 line.append(a)
-                next = file.readline()
-                if next == '':
+                n = file.readline()
+                if n == '':
                     stop = True
                     break
             inputList.append(line)
@@ -65,7 +66,7 @@ class pathfinding:
 
             # If goal found
             if current == goal:  # If its goal its done, and print the path
-                print("Goal Found")
+##                print("Goal Found")
                 path = []
                 while current in came_from:
                     path.append(current)
@@ -74,7 +75,7 @@ class pathfinding:
                 return path
 
             visited.add(current)
-            for i, j in moves:
+            for i, j in move:
                 neighbor = current[0] + i, current[1] + j
                 new_cost = cost_so_far[current] + self.heuristic(current, neighbor)
                 if 0 <= neighbor[0] < len(grid):
@@ -96,52 +97,105 @@ class pathfinding:
                     cost_so_far[neighbor] = new_cost
                     priority[neighbor] = new_cost + self.heuristic(neighbor, goal)
                     pq.heappush(frontier, (priority[neighbor], neighbor))
-        print("Goal Not Found")
+##        print("Goal Not Found")
         return None
 
-    def greedy(self, grid, start, goal, move):
-        frontier = []  # This is a priority queue
-        priority = {start: self.heuristic(start, goal)}
-        pq.heappush(frontier, (priority[start], start))
-        visited = set()
-        came_from = dict()  # Start comes from none
+    def legalPoints(self, maze, center, tried):
+        bound_y = len(maze)
+        bound_x = len(maze[0])
+        illegal = ["X","S"]
+        coordinates = []
+        if center[0] - 1 >= 0 and maze[center[0] - 1][center[1]] not in illegal and [center[0] - 1,center[1]] not in tried:
+            coordinates.append([center[0] - 1,center[1]])
+        if center[0] + 1 < bound_y and maze[center[0] + 1][center[1]] not in illegal and [center[0] + 1,center[1]] not in tried:
+            coordinates.append([center[0] + 1,center[1]])
+        if center[1] - 1 >= 0 and maze[center[0]][center[1] - 1] not in illegal and [center[0],center[1] - 1] not in tried:
+            coordinates.append([center[0],center[1] - 1])
+        if center[1] + 1 < bound_x and maze[center[0]][center[1] + 1] not in illegal and [center[0],center[1] + 1] not in tried:
+            coordinates.append([center[0],center[1] + 1])
+        return coordinates
 
-        while frontier:
-            current = pq.heappop(frontier)[1]  # Get coordinate
+    ## Greedy Search, return a list of solution
+    def greedy(self, maze, start, goal, tried):
+        # Base case: solution found
+        if start == goal:
+##            print("Goal Found")
+            return [goal]
 
-            if current == goal:  # If its goal is found
-                print("Goal Found")
-                path = []
-                while current in came_from:
-                    path.append(current)
-                    current = came_from[current]  # Back trace to origin
-                path = list(reversed(path))  # Reverse the path to real goal
-                return path
+        # identify where can we move to
+        legal_points = self.legalPoints(maze,start,tried)
 
-            visited.add(current) # Add current into visited list, prevent visit again
+        # Base case: dead end
+        if len(legal_points) == 0:
+##            print("Goal Not Found")
+            return []
 
-            for i, j in moves:
-                neighbor = current[0] + i, current[1] + j  # Neighbor's coordinate calculated with the move list
-                if 0 <= neighbor[0] < len(grid):  # If its inside left and right wall
-                    if 0 <= neighbor[1] < len(grid[0]): # If itz inside up and bottom wall
-                        if grid[neighbor[0]][neighbor[1]] == "X":  # If its a internal wall
-                            continue # Skip this move
-                    else:
-                        # Grid bound y walls
-                        continue
-                else:
-                    # Grid bound x walls
-                    continue
+        #calculate distance square of the points identified to the goal
+        for n in legal_points:
+            n.append((n[0] - goal[0])**2 + (n[1] - goal[1])**2)
 
-                if neighbor in visited:
-                    continue
+        # sort according to the heuristics (distance square)
+        legal_points.sort(key = lambda x: x[2])
 
-                if neighbor not in came_from:
-                    priority[neighbor] = self.heuristic(neighbor, goal)
-                    pq.heappush(frontier, (priority[neighbor], neighbor))
-                    came_from[neighbor] = current
-        print("Goal Not Found")
-        return None
+        # search for solution
+        for point in legal_points:
+            point = point[:-1]
+            new_maze = copy(maze)
+            solution = [start]
+            tried.append(point)
+            solution += self.greedy(new_maze, point, goal, tried)
+            if solution[-1] == goal:
+##                print("Goal Found")
+                return solution
+            
+##        print("Goal Not Found")
+        return [] # No solution found
+
+##    def greedy(self, grid, start, goal, move):
+##        frontier = []  # This is a priority queue
+##        priority = {start: self.heuristic(start, goal)}
+##        pq.heappush(frontier, (priority[start], start))
+##        visited = set()
+##        came_from = dict()  # Start comes from none
+##
+##        while frontier:
+##            current = pq.heappop(frontier)[1]  # Get coordinate
+##
+##            if current == goal:  # If its goal is found
+##                print("Goal Found")
+##                path = []
+##                while current in came_from:
+##                    path.append(current)
+##                    current = came_from[current]  # Back trace to origin
+##                path = list(reversed(path))  # Reverse the path to real goal
+##                return path
+##
+##            visited.add(current) # Add current into visited list, prevent visit again
+##
+##            for i, j in moves:
+##                neighbor = current[0] + i, current[1] + j  # Neighbor's coordinate calculated with the move list
+##                if 0 <= neighbor[0] < len(grid):  # If its inside left and right wall
+##                    if 0 <= neighbor[1] < len(grid[0]): # If itz inside up and bottom wall
+##                        if grid[neighbor[0]][neighbor[1]] == "X":  # If its a internal wall
+##                            continue # Skip this move
+##                    else:
+##                        # Grid bound y walls
+##                        continue
+##                else:
+##                    # Grid bound x walls
+##                    continue
+##
+##                if neighbor in visited:
+##                    continue
+##
+##                if neighbor not in came_from:
+##                    priority[neighbor] = self.heuristic(neighbor, goal)
+##                    pq.heappush(frontier, (priority[neighbor], neighbor))
+##                    came_from[neighbor] = current
+##        print("Goal Not Found")
+##        return None
+
+
 
 def mazes_maker(num):
     mazes = []
@@ -150,7 +204,7 @@ def mazes_maker(num):
         for j in range(1022):
             row = ["X"]
             for k in range(1022):
-                row.append("X" if random() < 0.6 else "_")
+                row.append("X" if random() < 0.5 else "_")
             row.append("X")
             maze.append(row)
         mazes.append(maze)
@@ -162,9 +216,17 @@ def mazes_maker(num):
     print("finished initializing mazes")
     return mazes
 
-mazes = mazes_maker(10)
-pf = pathfinding()
+if __name__ == "__main__":
+    mazes = mazes_maker(2)
+    pf = pathfinding()
 
-for m in mazes:
-    sg = pf.find_start_goal(m)
-    a.A_star(m, sg[0], sg[1], )
+    for m in mazes:
+        sg = pf.find_start_goal(m)
+        if pf.A_star(m, sg[0], sg[1], [(0, 1), (0, -1), (1, 0), (-1, 0)]) is None:
+            print("No solution for A*")
+        else:
+            print("Solution for A*")
+        if pf.greedy(m, sg[0], sg[1], []) == []:
+            print("No solution for greedy")
+        else:
+            print("Solution for greedy.")
