@@ -146,6 +146,9 @@ class pathfinding:
 
     def execute(self, is_diagonal):
         if is_diagonal:
+            if len(self.grids_b) <= 0:
+                print("The input is empty")
+                return None
             for grid in self.grids_b:
                 start_goal = self.find_start_goal(grid)
                 if start_goal:
@@ -167,6 +170,9 @@ class pathfinding:
                     print("No start or goal point found")
                     continue
         else:
+            if len(self.grids_a) <= 0:
+                print("The input is empty")
+                return None
             for grid in self.grids_a:
                 start_goal = self.find_start_goal(grid)
                 if start_goal:
