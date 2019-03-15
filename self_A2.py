@@ -63,6 +63,14 @@ class pathfinding:
     def heuristic(self, x, y):
         return (sum([(a - b) ** 2 for a, b in zip(x, y)]))**0.5
 
+##    def heuristic(self, a, b):
+##        # Manhattan distance on a grid
+##        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+##
+##    def heuristic(self, a, b):
+##        # Chebyshev distance on a grid
+##        return max(abs(b[0]-a[0]),abs(b[1]-a[1]))
+
     def A_star(self, grid, start, goal, movement):
         frontier = []
         cost_so_far = {start: 0}
